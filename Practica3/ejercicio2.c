@@ -14,6 +14,7 @@ int main(int argc, char const *argv[])
 	int tuberia1;
 	int tuberia2;
 	int numero;
+	int status;
 	int resultado;
 	char retorno[100];
 
@@ -74,9 +75,11 @@ int main(int argc, char const *argv[])
 			}
 
 			if(numero % 2 == 0)
-				retorno= "par";
+				// retorno[0] = "par";
+			strcpy(retorno,"par");
 			else
-				retorno = "impar";
+				// retorno[0] = "impar";
+				strcpy(retorno, "impar");
 
 			nbytes = write(fildes2[1],retorno,100);
 			if(nbytes == -1)
@@ -101,10 +104,10 @@ int main(int argc, char const *argv[])
 				exit(EXIT_FAILURE);
 			}
 			//Pedimos el numero por pantalla
-			printf("Introduzca numero -->\n");
+			printf("Introduzca numero --> ");
 			scanf("%d",&numero);
 			//Escribimos datos en la tuberia
-			resultado = write(fildes[1],&numero,sizeof(int))
+			resultado = write(fildes[1],&numero,sizeof(int));
 			if(resultado != sizeof(int))
 			{
 				printf("[Padre] Error al escribir\n");
@@ -137,6 +140,7 @@ int main(int argc, char const *argv[])
 				exit(EXIT_FAILURE);
 			}
 			printf("El numero %d es %s\n",numero,retorno);
+
 			while ( (flag=wait(&status)) > 0 ) 
 			{
 				if (WIFEXITED(status)) {
