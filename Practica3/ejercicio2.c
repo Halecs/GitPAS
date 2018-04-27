@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
 		return;
 	}
 
-	tuberia2 = pipe(fildes);
+	tuberia2 = pipe(fildes2);
 	if(tuberia2 == -1)
 	{
 		printf("Error al crear la tuberia 2\n");
@@ -48,7 +48,7 @@ int main(int argc, char const *argv[])
 			//No escribimos, la cerramos
 			if (close(fildes[1]) == -1) 
 			{
-				perror("Error en close"); 
+				perror("Error en close1"); 
 				exit(EXIT_FAILURE);
 			}
 
@@ -62,15 +62,15 @@ int main(int argc, char const *argv[])
 
 			if(close(fildes[0]) == -1)
 			{
-				printf("Error en close\n");
+				printf("Error en close1\n");
 				exit(EXIT_FAILURE);
 			}
-			printf("[Hijo] Tuberia cerrada\n");
+			// printf("[Hijo] Tuberia cerrada\n");
 
 			//No leemos, cerramos el 0
 			if(close(fildes2[0]) == -1)
 			{
-				perror("Error en close");
+				perror("Error en close2");
 				exit(EXIT_FAILURE);
 			}
 
@@ -90,7 +90,7 @@ int main(int argc, char const *argv[])
 
 			if(close(fildes2[1]) == -1)
 			{
-				perror("Error en el close");
+				perror("Error en el close2");
 				exit(EXIT_FAILURE);
 			}
 
@@ -100,7 +100,7 @@ int main(int argc, char const *argv[])
 			//No necesitamos leer
 			if(close(fildes[0]) == -1)
 			{
-				printf("Error en close\n");
+				printf("Error en close2\n");
 				exit(EXIT_FAILURE);
 			}
 			//Pedimos el numero por pantalla
@@ -123,7 +123,7 @@ int main(int argc, char const *argv[])
 			//Cerramos porque no escribimos
 			if (close(fildes2[1]) == -1)
 			{
-				printf("Error en el close\n");
+				printf("Error en el close2\n");
 				exit(EXIT_FAILURE);
 			}
 
@@ -136,10 +136,11 @@ int main(int argc, char const *argv[])
 
 			if(close(fildes2[0]) == -1)
 			{
-				printf("Error en el close\n");
+				printf("Error en el close2\n");
 				exit(EXIT_FAILURE);
 			}
 			printf("El numero %d es %s\n",numero,retorno);
+
 
 			while ( (flag=wait(&status)) > 0 ) 
 			{
