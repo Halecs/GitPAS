@@ -27,7 +27,8 @@ int main(int argc, char **argv)
 	mq_grep = mq_open(GREP_QUEUE, O_RDONLY);
 	if(mq_grep == ((mqd_t) -1))
 	{
-
+      perror("Error al abrir la cola del servidor");
+      exit(-1);
 	}
 
 	printf("Mandando mensajes al servidor (escribir \"%s\" para parar):\n", MSG_STOP);

@@ -8,6 +8,11 @@
 #include <errno.h>
 #include "common.h"
 
+#include <unistd.h>
+#include <regex.h>
+#include <getopt.h>
+
+
 int main(int argc, char **argv)
 {
 	int c;
@@ -15,7 +20,6 @@ int main(int argc, char **argv)
 	mqd_t mq_server;
 	// Atributos de la cola
 	struct mq_attr attr;
-	struct mq_attr attr2;
 	// Buffer para intercambiar mensajes
 	char buffer[MAX_SIZE + 1];
 	// flag que indica cuando hay que parar. Se escribe palabra exit
@@ -23,6 +27,18 @@ int main(int argc, char **argv)
 	// Inicializar los atributos de la cola
 	attr.mq_maxmsg = 10;        // Maximo número de mensajes
 	attr.mq_msgsize = MAX_SIZE; // Maximo tamaño de un mensaje
+
+	char* rex = NULL;
+	regex_t regex;	//Comprobar si empareja o no
+    int reti;//lo mismo de arriba
+	struct option long_options[]={
+
+		{"regex",	 required_argument,	   0, 'r'}
+		{0,0,0,0}
+	
+	};
+
+	FILE *fLog = NULL;
 
 	// Crear la cola de mensajes del servidor. La cola CLIENT_QUEUE le servira en ejercicio resumen
 	mq_server = mq_open(SERVER_QUEUE, O_CREAT | O_RDONLY, 0644, &attr);	
@@ -32,14 +48,14 @@ int main(int argc, char **argv)
       exit(-1);
 	}
 
-	mq_grep = mq_open(GREP_QUEUE, O_CREAT, 0644, &attr2);
+	mq_grep = mq_open(GREP_QUEUE, O_CREAT, 0644, &attr);
 	if(mq_grep == ((mqd_t) -1))
 	{
 		perror("Error al abrir la cola del grep")
 		exit(-1);
 	}
 // LEEMOS PARSEANDO LA LINEA DE COMANDOS LA EXPRESION A EMPAREJAR
-    opterr = 0; 
+/*    opterr = 0; 
     while ((c = getopt (argc, argv, "r:")) != -1)
     {
         // Podemos observar qué pasa con las variables externas que va gestionando
@@ -53,7 +69,7 @@ int main(int argc, char **argv)
 		    	cvalue = optarg;
 		        break;
 		     case '?': //Opcion no reconocida o INCOMPLETA. Probar tambien la diferencia entre ejecutar %$>./a.out m   ó   %$>./a.out -m
-		         if (optopt == 'c') //Para el caso de que 'c' no tenga el argumento obligatorio.
+		         if (optopt == 'r') //Para el caso de que 'c' no tenga el argumento obligatorio.
 		             fprintf (stderr, "La opción %c requiere un argumento. Valor de opterr = %d\n", optopt, opterr);
 		         else if (isprint (optopt)) //Se mira si el caracter es imprimible
 		             fprintf (stderr, "Opción desconocida \"-%c\". Valor de opterr = %d\n", optopt, opterr);
@@ -64,7 +80,56 @@ int main(int argc, char **argv)
 		         abort ();
         }
         printf("optind: %d, optarg: %s, optopt: %c, opterr: %d\n", optind, optarg, optopt, opterr);
-    }
+    }*/
+
+	while ((c = getopt_long (argc, argv, "r:", long_options, &option_index))!=-1)
+	{
+		/* El usuario ha terminado de introducir opciones */
+		if (c == -1)
+			break;
+		switch (c)
+		{
+			case 'r':
+				rex=optarg;
+				break;
+			case '?':
+				fprintf(stderr, "La opcion %c requiere un argumento.",optopt);
+				break;
+
+			default:
+				abort ();
+		}
+		printf("optind: %d, optarg: %s, optopt: %c\n", optind, optarg, optopt);
+	}
+
+	if(rex != NULL)//para saber si le ha pasado la opcion de introducir una cadena si no no ha introducido nada y rex da null 
+	{
+		
+        reti = regcomp(&regex, rex, 0);//preparamos la expresion regular
+        //Compilar la expresion regular
+        if( reti )//Que es distinto de 0
+    	{ 
+    		sprintf(msgBuff,"Error al crear la expresion regular");
+    		perror("Error al crear la expresion regular.\n"); 
+    		// funcionLog(msgBuff);
+
+    		
+    		if(mq_send(mq_server, MSG_STOP, MAX_SIZE, 0) != 0)//Si se ha producido algun error algun expresion se escribe un mensaje de error en la cola para desconectar en la cola
+    		{
+    			perror("Error en el envío.");
+    			// funcionLog("Error en el envío");
+    		}
+
+    		exit(-1); 
+    	}
+	}
+
+    else
+	{
+		printf("No ha introducido expresion regular\n");
+		// funcionLog("No ha introducido expresion regular");
+		exit(-1);
+	}
 
 
 
