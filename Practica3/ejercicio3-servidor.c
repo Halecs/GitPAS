@@ -18,10 +18,13 @@ int main(int argc, char **argv)
 	int c;
 	// Cola del servidor
 	mqd_t mq_server;
+	mqd_t mq_grep;
 	// Atributos de la cola
 	struct mq_attr attr;
 	// Buffer para intercambiar mensajes
 	char buffer[MAX_SIZE + 1];
+    char emparejador[MAX_SIZE];
+
 	// flag que indica cuando hay que parar. Se escribe palabra exit
 	int must_stop = 0;
 	// Inicializar los atributos de la cola
@@ -124,6 +127,31 @@ int main(int argc, char **argv)
 		// Cerrar la cadena
 		buffer[bytes_read] = '\0';
 
+        reti = regexec(&regex, buffer, 0, NULL, 0);
+
+		if(reti == 0)
+		{
+			sprintf(emparejador, "Empareja");
+
+            
+			if(mq_send(mq_cliente, emparejador, MAX_SIZE, 0) != 0)
+			{
+			perror("Error al enviar el mensaje");
+			// funcionLog("Error al enviar el mensaje");
+			exit(-1);
+			}
+		} else if(reti != 0)
+		{
+			sprintf(emparejador, "No Empareja");
+
+            
+			if(mq_send(mq_cliente, emparejador, MAX_SIZE, 0) != 0)
+			{
+				perror("Error al enviar el mensaje");
+				// funcionLog("Error al enviar el mensaje");
+				exit(-1);
+			}
+		}
 
 		// Comprobar el fin del bucle
 		if (strncmp(buffer, MSG_STOP, strlen(MSG_STOP))==0)

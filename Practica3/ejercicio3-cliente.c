@@ -46,6 +46,14 @@ int main(int argc, char **argv)
 			perror("Error al enviar el mensaje");
 			exit(-1);
 		}
+
+		if(mq_receive(mq_grep, emparejador, MAX_SIZE, NULL) < 0)
+		{
+			
+			perror("Error al recibir el mensaje.");
+			// funcionLog("Error al recibir el mensaje");
+			exit(-1);
+		}
 	// Iterar hasta escribir el código de salida
 	}while (strncmp(buffer, MSG_STOP, strlen(MSG_STOP)));
 
