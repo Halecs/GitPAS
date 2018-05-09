@@ -54,33 +54,6 @@ int main(int argc, char **argv)
 		perror("Error al abrir la cola del grep")
 		exit(-1);
 	}
-// LEEMOS PARSEANDO LA LINEA DE COMANDOS LA EXPRESION A EMPAREJAR
-/*    opterr = 0; 
-    while ((c = getopt (argc, argv, "r:")) != -1)
-    {
-        // Podemos observar qué pasa con las variables externas que va gestionando
-        //   getopt() durante las sucesivas llamadas. 
-        //   - optind Indice del siguiente elemento a procesar del vector argv[]
-        //   - optarg recoge el valor del argumento obligario de una opcion.
-        //   - optopt recoge el valor de la opcion cuando es desconocida (?) o INCOMPLETA respecto a las opciones indicadas.        
-        switch (c)
-        {
-		     case 'r':
-		    	cvalue = optarg;
-		        break;
-		     case '?': //Opcion no reconocida o INCOMPLETA. Probar tambien la diferencia entre ejecutar %$>./a.out m   ó   %$>./a.out -m
-		         if (optopt == 'r') //Para el caso de que 'c' no tenga el argumento obligatorio.
-		             fprintf (stderr, "La opción %c requiere un argumento. Valor de opterr = %d\n", optopt, opterr);
-		         else if (isprint (optopt)) //Se mira si el caracter es imprimible
-		             fprintf (stderr, "Opción desconocida \"-%c\". Valor de opterr = %d\n", optopt, opterr);
-		         else //Caracter no imprimible o especial
-		             fprintf (stderr, "Caracter `\\x%x'. Valor de opterr = %d\n", optopt, opterr);
-		         return 1;  //Finaliza el programa
-		     default:
-		         abort ();
-        }
-        printf("optind: %d, optarg: %s, optopt: %c, opterr: %d\n", optind, optarg, optopt, opterr);
-    }*/
 
 	while ((c = getopt_long (argc, argv, "r:", long_options, &option_index))!=-1)
 	{
