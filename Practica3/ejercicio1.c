@@ -8,15 +8,12 @@
 #include <grp.h>
 #include <sys/types.h>
 
-int main(int argc, char const *argv[])
+int main(int argc, char **argv)
 {
 	int c;
-	char* uvalue = NULL;
-	char* ivalue = NULL;
-	char* dvalue = NULL;
-	char* gvalue = NULL;
-	char* avalue = NULL;
+	char* value = NULL;
 	int option = 0;
+	int option_index = 0;
 	struct passwd *pw;
 	struct group *gr;
 
@@ -33,7 +30,7 @@ int main(int argc, char const *argv[])
   		{0, 0, 0, 0}
  	};
 
-    while((c=getopt_long(argc,argv,"u:i:g:d:sa:bh",long_options, &option_index))!=-1){
+    while((c=getopt_long(argc,argv,"u:i:g:d:sa:bh",long_options, &option_index)) !=-1)
     {
     	if(c == -1)
     		break;
@@ -60,7 +57,7 @@ int main(int argc, char const *argv[])
 
 			case 'i':
 				value = optarg;
-				if((pw = getpwuid(value)) == NULL)
+				if((pw = getpwuid(atoi(value))) == NULL)
 				{
 					fprintf(stderr, "Get of user information failed\n");
 					exit(-1);
@@ -87,7 +84,7 @@ int main(int argc, char const *argv[])
 				printf("Home: %s\n", pw->pw_dir);
 				printf("Número de grupo principal: %d\n", pw->pw_gid);
 				
-				if((gr = getgrgid(pq->pw_gid)) == NULL)
+				if((gr = getgrgid(pw->pw_gid)) == NULL)
 				{
 					fprintf(stderr, "Get of user information failed\n");
 					exit(-1);
@@ -105,11 +102,12 @@ int main(int argc, char const *argv[])
           	case 'b':
           		if((gr = getgrgid(getegid())) == NULL)
           		{
-          			fprintf(stderr, "Get of group information failed\n", );
+          			fprintf(stderr, "Get of group information failed\n");
           			exit(-1);
           		}
       			printf("ID:%d Nombre del grupo: %s\n",gr->gr_gid, gr->gr_name);
       			break;
+
       		case '?':
       			break;
 
@@ -117,5 +115,4 @@ int main(int argc, char const *argv[])
       			abort();           		
     	}
     }
-
 }
